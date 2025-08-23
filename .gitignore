@@ -1,0 +1,83 @@
+# Firebase build and deployment files
+/firebase-debug.log
+/firebase-debug.*.log
+.firebaserc
+
+# Firebase Hosting
+/firebase.json
+*.cache
+hosting/.cache
+
+# Firebase Functions
+/functions/node_modules/
+/functions/.env
+/functions/package-lock.json
+
+# Firebase Emulators
+/firebase-*.zip
+/.firebase/
+/emulator-ui/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (local configs)
+/.env.*
+# Diretórios e arquivos gerados pelo Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+# Opcional: Para evitar que a pasta Cache seja versionada
+[Cc]ache/
+
+# Arquivos de metadados gerados pelo Unity para diretórios ignorados
+# Não é necessário, pois o Git já lida com isso, mas pode ser útil para clareza
+# [Ll]ibrary.meta
+# [Tt]emp.meta
+# [Oo]bj.meta
+
+# Arquivos de solução e projeto do Visual Studio
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+
+# Arquivos gerados pelo JetBrains Rider
+.idea/
+
+# Arquivos de Debug/build
+*.pdb
+*.pdb.meta
+*.unitypackage
+*.apk
+*.aab
+*.exe
+*.dll
+
+# Logs e relatórios
+*.log
+*.log.meta
+crash.dmp
+
+---
+### Regras Específicas para Firebase
+
+# Arquivos de configuração sensíveis do Firebase
+# Esses arquivos contêm as chaves da sua aplicação e não devem ser versionados
+google-services.json
+GoogleService-Info.plist
+
+# Cache e arquivos temporários do Firebase
+.firebase/
+firebase-debug.log
