@@ -81,3 +81,90 @@ GoogleService-Info.plist
 # Cache e arquivos temporários do Firebase
 .firebase/
 firebase-debug.log
+
+# # Ambientes Virtuais e Dependências
+# Ignora pastas de ambientes virtuais comuns em Python para evitar
+# o versionamento de bibliotecas inteiras.
+venv/
+env/
+.venv/
+.env/
+__pypackages__/
+
+# # Arquivos de Cache e Compilados do Python
+# Ignora os arquivos de bytecode e caches gerados pelo Python.
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# # Jupyter Notebook
+# Ignora os checkpoints gerados automaticamente pelo Jupyter.
+.ipynb_checkpoints/
+
+# # Dados
+# É crucial não versionar grandes conjuntos de dados.
+# Considere o uso de Git LFS (Large File Storage) ou DVC (Data Version Control)
+# para datasets. Se não for o caso, ignore-os.
+data/
+datasets/
+*.csv
+*.json
+*.jsonl
+*.parquet
+*.hdf5
+*.db
+*.sqlite3
+
+# # Modelos de Machine Learning e Checkpoints
+# Modelos treinados e checkpoints podem ser muito grandes.
+# Assim como os dados, utilize Git LFS ou outra ferramenta de versionamento
+# de artefatos.
+models/
+checkpoints/
+*.pt
+*.pth
+*.h5
+*.hdf5
+*.onnx
+*.pb
+*.pkl
+*.pickle
+*.joblib
+*.tflite
+*.weights
+
+# # Arquivos de Configuração e Credenciais
+# Nunca versione chaves de API, senhas ou outras informações sensíveis.
+# Utilize variáveis de ambiente ou um sistema de gerenciamento de segredos.
+.env
+*.env
+config.ini
+credentials.json
+secrets.yml
+
+# # Logs e Saídas de Experimentos
+# Arquivos de log e saídas de execuções podem poluir o repositório.
+logs/
+*.log
+results/
+output/
+
+# # Arquivos de IDEs e Editores
+# Ignora arquivos de configuração específicos do ambiente de desenvolvimento.
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# # Arquivos de Sistema Operacional
+# Ignora arquivos de sistema gerados pelo macOS, Windows e Linux.
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# # Arquivos de Build e Distribuição
+# Ignora pacotes e distribuições gerados.
+build/
+dist/
+*.egg-info/
