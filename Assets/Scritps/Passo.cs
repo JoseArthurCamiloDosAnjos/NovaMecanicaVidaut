@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [System.Serializable]
 public class Passo
@@ -9,7 +9,7 @@ public class Passo
     [Header("Para Clique")]
     public GameObject objetoClique;
 
-    [Header("Para Colisão")]
+    [Header("Para ColisÃ£o")]
     public GameObject objetoA;
     public GameObject objetoB;
 
@@ -30,7 +30,6 @@ public class Passo
 
     public void IniciarPasso()
     {
-        // Ativa/desativa logo ao iniciar
         foreach (var obj in objetosParaAtivarNoInicio)
             if (obj != null) obj.SetActive(true);
 
@@ -43,7 +42,6 @@ public class Passo
 
     public void FinalizarPasso()
     {
-        // Ativa/desativa só quando concluir
         foreach (var obj in objetosParaAtivarNoFim)
             if (obj != null) obj.SetActive(true);
 

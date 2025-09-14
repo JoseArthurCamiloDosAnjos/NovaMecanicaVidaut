@@ -9,10 +9,10 @@ public class Banheiro_Minigame : MonoBehaviour
     void Start()
     {
         if (passos.Length > 0)
-        {
-            // já prepara os objetos do primeiro passo
-            passos[0].IniciarPasso();
-        }
+            passos[passoAtual].IniciarPasso();
+
+        // Sincroniza UI no início
+        mecanica.MudarPasso(passoAtual);
     }
 
     void Update()
@@ -21,6 +21,7 @@ public class Banheiro_Minigame : MonoBehaviour
 
         Passo passo = passos[passoAtual];
 
+        // --- Clique ---
         if (passo.tipo == Passo.TipoPasso.Clique && Input.GetMouseButtonDown(0))
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -34,7 +35,18 @@ public class Banheiro_Minigame : MonoBehaviour
         }
     }
 
+    // --- Colisão física ---
     void OnCollisionEnter2D(Collision2D collision)
+    {
+        VerificarColisao(collision.collider.gameObject, collision.otherCollider.gameObject);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        VerificarColisao(this.gameObject, other.gameObject);
+    }
+
+    void VerificarColisao(GameObject obj1, GameObject obj2)
     {
         if (passoAtual >= passos.Length) return;
 
@@ -42,13 +54,11 @@ public class Banheiro_Minigame : MonoBehaviour
 
         if (passo.tipo == Passo.TipoPasso.Colisao)
         {
-            GameObject colisor = collision.collider.gameObject;
-
-            if ((colisor == passo.objetoA && collision.otherCollider.gameObject == passo.objetoB) ||
-                (colisor == passo.objetoB && collision.otherCollider.gameObject == passo.objetoA))
+            if ((obj1 == passo.objetoA && obj2 == passo.objetoB) ||
+                (obj1 == passo.objetoB && obj2 == passo.objetoA))
             {
                 ConcluirPasso();
-                Debug.Log($"Passo {passoAtual - 1} concluído (Colisão)!");
+                Debug.Log($"Passo {passoAtual - 1} concluído (Colisão/Trigger)!");
             }
         }
     }
@@ -57,27 +67,26 @@ public class Banheiro_Minigame : MonoBehaviour
     {
         // Finaliza passo atual
         passos[passoAtual].FinalizarPasso();
-        mecanica.ProximoPasso();
+        mecanica.DefinirPasso(passoAtual, true); // Marca concluído na UI
 
         // Avança para o próximo
         passoAtual++;
         if (passoAtual < passos.Length)
         {
-            // prepara objetos do próximo passo
             passos[passoAtual].IniciarPasso();
+            mecanica.MudarPasso(passoAtual); // Atualiza UI
         }
+
+        Debug.Log("Avançou para o passo: " + passoAtual);
     }
 
     public void VoltarPasso()
     {
         if (passoAtual > 0)
         {
-            passos[passoAtual].FinalizarPasso(); // limpa estado do passo atual
-
             passoAtual--;
-            mecanica.PassoAnterior();
-
-            passos[passoAtual].IniciarPasso(); // reativa objetos do passo anterior
+            mecanica.MudarPasso(passoAtual);
+            passos[passoAtual].IniciarPasso();
         }
     }
 }

@@ -4,12 +4,12 @@ using UnityEngine.UI;
 public class Mecanica_Passo : MonoBehaviour
 {
     [Header("UI de Progresso")]
-    public Toggle[] listaToggles;           // Arraste todos os Toggles (checkboxes)
-    public GameObject[] imagensConclusao;   // Arraste os ícones de concluído
-    public ToggleGroup grupo;               // ToggleGroup
-    Banheiro_Minigame bMinigame;
+    public Toggle[] listaToggles;
+    public GameObject[] imagensConclusao;
+    public ToggleGroup grupo;
+
     [Header("Objetos da cena na ordem dos passos")]
-    public GameObject[] objetosPorPasso;    // Arraste os objetos que devem ser clicados na ordem certa
+    public GameObject[] objetosPorPasso;
 
     private bool[] passosConcluidos;
     private int passoAtual = 0;
@@ -23,11 +23,9 @@ public class Mecanica_Passo : MonoBehaviour
         {
             int index = i;
 
-            // Garante que todas as imagens começam invisíveis
             if (imagensConclusao[index] != null)
                 imagensConclusao[index].SetActive(false);
 
-            // Configura evento de seleção do Toggle
             listaToggles[i].onValueChanged.AddListener((bool ligado) =>
             {
                 if (ligado)
@@ -40,56 +38,43 @@ public class Mecanica_Passo : MonoBehaviour
         AtualizarUI();
     }
 
-    public void ProximoPasso()
+    // ✅ Marca um passo como concluído
+    public void DefinirPasso(int index, bool concluido)
     {
-        // Marca o passo atual como concluído
-        passosConcluidos[passoAtual] = true;
+        if (index < 0 || index >= passosConcluidos.Length) return;
 
-        // Ativa a imagem de concluído
-        if (imagensConclusao[passoAtual] != null)
-            imagensConclusao[passoAtual].SetActive(true);
+        passosConcluidos[index] = concluido;
 
-        // Avança para o próximo se existir
-        if (passoAtual + 1 < listaToggles.Length)
-        {
-            passoAtual++;
-            listaToggles[passoAtual].isOn = true; // muda o Toggle ativo
-        }
+        if (imagensConclusao[index] != null)
+            imagensConclusao[index].SetActive(concluido);
 
         AtualizarUI();
     }
 
-    public void PassoAnterior()
+    // ✅ Sincroniza o passo atual
+    public void MudarPasso(int index)
     {
-        if (passoAtual > 0)
-        {
-            bMinigame.VoltarPasso();
-            passoAtual--;
-            listaToggles[passoAtual].isOn = true;
-        }
+        if (index < 0 || index >= listaToggles.Length) return;
+
+        passoAtual = index;
+        listaToggles[passoAtual].isOn = true;
+        AtualizarUI();
     }
 
     void AtualizarUI()
     {
         for (int i = 0; i < listaToggles.Length; i++)
         {
-            // Só o passo atual fica com o Toggle ligado
             listaToggles[i].isOn = (i == passoAtual);
-
-            // Passos anteriores e o atual ficam interativos, futuros bloqueados
             listaToggles[i].interactable = (i <= passoAtual);
 
-            // Mostra a imagem de concluído se o passo já foi feito
             if (imagensConclusao[i] != null)
                 imagensConclusao[i].SetActive(passosConcluidos[i]);
         }
     }
 
-    // 🔹 Verifica se o objeto clicado é o esperado no passo atual
     public bool ObjetoCorreto(GameObject objeto)
     {
         return passoAtual < objetosPorPasso.Length && objetosPorPasso[passoAtual] == objeto;
     }
-   
 }
-
