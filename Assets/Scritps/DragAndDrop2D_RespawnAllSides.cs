@@ -6,13 +6,14 @@ public class DragAndDrop2D_RespawnAllSides : MonoBehaviour
     private bool isDragging = false;
     private Camera mainCamera;
     private Vector3 initialPosition;
-
+    private Mecanica_Passo MP;
+    public Animator animator;
     void Start()
     {
         mainCamera = Camera.main;
         initialPosition = transform.position; // posição inicial do objeto
     }
-
+    // Quando clica no objeto, inicia o arrasto
     void OnMouseDown()
     {
         Vector3 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -20,6 +21,7 @@ public class DragAndDrop2D_RespawnAllSides : MonoBehaviour
         isDragging = true;
     }
 
+    // Arrasta o objeto junto com o mouse
     void OnMouseDrag()
     {
         if (isDragging)
@@ -29,6 +31,7 @@ public class DragAndDrop2D_RespawnAllSides : MonoBehaviour
         }
     }
 
+    // Quando solta o mouse, verifica se está fora da tela
     void OnMouseUp()
     {
         isDragging = false;
