@@ -4,18 +4,26 @@ using UnityEngine.UI;
 public class Mecanica_Passo : MonoBehaviour
 {
     [Header("UI de Progresso")]
-    public Toggle[] listaToggles;
-    public GameObject[] imagensConclusao;
-    public ToggleGroup grupo;
+    public Toggle[] listaToggles;         // Arraste todos os Toggles (checkboxes)
+    public GameObject[] imagensConclusao; // Arraste os ícones de concluído
+    public ToggleGroup grupo;             // ToggleGroup
 
-    [Header("Objetos da cena na ordem dos passos")]
-    public GameObject[] objetosPorPasso;
+    [Header("Referências")]
+    public Banheiro_Minigame bMinigame;     // Arraste o objeto com o script Banheiro_Minigame aqui
+
+ 
 
     private bool[] passosConcluidos;
     private int passoAtual = 0;
 
     void Start()
     {
+        // Tenta encontrar a referência do minigame se não foi arrastada no Inspector
+        if (bMinigame == null)
+        {
+            bMinigame = FindObjectOfType<Banheiro_Minigame>();
+        }
+
         int quantidade = listaToggles.Length;
         passosConcluidos = new bool[quantidade];
 
@@ -30,34 +38,44 @@ public class Mecanica_Passo : MonoBehaviour
             {
                 if (ligado)
                 {
-                    passoAtual = index;
+                    // Lógica para pular entre os passos (se necessário)
+                    // Esta parte pode ser ajustada dependendo do comportamento desejado
                 }
             });
         }
-
         AtualizarUI();
     }
 
-    // ✅ Marca um passo como concluído
-    public void DefinirPasso(int index, bool concluido)
+    public void ProximoPasso()
     {
-        if (index < 0 || index >= passosConcluidos.Length) return;
+        if (passoAtual < passosConcluidos.Length)
+        {
+            passosConcluidos[passoAtual] = true;
+        }
 
-        passosConcluidos[index] = concluido;
-
-        if (imagensConclusao[index] != null)
-            imagensConclusao[index].SetActive(concluido);
-
+        if (passoAtual + 1 < listaToggles.Length)
+        {
+            passoAtual++;
+        }
         AtualizarUI();
     }
 
-    // ✅ Sincroniza o passo atual
-    public void MudarPasso(int index)
+    // ATUALIZAÇÃO: Este método é chamado por um botão na UI para INICIAR o processo de voltar
+    public void PassoAnterior()
     {
-        if (index < 0 || index >= listaToggles.Length) return;
+        // Ele apenas chama o método principal no script do minigame.
+        if (bMinigame != null)
+        {
+            bMinigame.VoltarPasso();
+        }
+    }
 
-        passoAtual = index;
-        listaToggles[passoAtual].isOn = true;
+    // ATUALIZAÇÃO: Novo método para ser controlado pelo Banheiro_Minigame
+    // Sincroniza a UI com o estado atual do jogo quando um passo é voltado.
+    public void AtualizarParaPasso(int novoPasso)
+    {
+        passoAtual = novoPasso;
+        passosConcluidos[passoAtual] = false; // Desmarca o passo como concluído
         AtualizarUI();
     }
 
@@ -66,15 +84,14 @@ public class Mecanica_Passo : MonoBehaviour
         for (int i = 0; i < listaToggles.Length; i++)
         {
             listaToggles[i].isOn = (i == passoAtual);
-            listaToggles[i].interactable = (i <= passoAtual);
 
-            if (imagensConclusao[i] != null)
+            // Permite clicar nos passos já concluídos para revisitá-los (opcional)
+            listaToggles[i].interactable = passosConcluidos[i] || (i == passoAtual);
+
+            if (imagensConclusao.Length > i && imagensConclusao[i] != null)
                 imagensConclusao[i].SetActive(passosConcluidos[i]);
         }
     }
 
-    public bool ObjetoCorreto(GameObject objeto)
-    {
-        return passoAtual < objetosPorPasso.Length && objetosPorPasso[passoAtual] == objeto;
-    }
+
 }

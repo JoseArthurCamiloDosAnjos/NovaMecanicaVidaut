@@ -1,4 +1,4 @@
-Ôªøusing UnityEngine;
+using UnityEngine;
 
 [System.Serializable]
 public class Passo
@@ -9,7 +9,7 @@ public class Passo
     [Header("Para Clique")]
     public GameObject objetoClique;
 
-    [Header("Para Colis√£o")]
+    [Header("Para Colis„o")]
     public GameObject objetoA;
     public GameObject objetoB;
 
@@ -25,8 +25,7 @@ public class Passo
     [Header("Objetos para Desativar ao Finalizar")]
     public GameObject[] objetosParaDesativarNoFim;
 
-    [Header("Destaque visual (opcional)")]
-    public GameObject objetoDestaque;
+    // REMOVEMOS A REFER NCIA AO SCRIPT DE ANIMA«√O DAQUI
 
     public void IniciarPasso()
     {
@@ -35,9 +34,6 @@ public class Passo
 
         foreach (var obj in objetosParaDesativarNoInicio)
             if (obj != null) obj.SetActive(false);
-
-        if (objetoDestaque != null)
-            objetoDestaque.SetActive(true);
     }
 
     public void FinalizarPasso()
@@ -47,8 +43,19 @@ public class Passo
 
         foreach (var obj in objetosParaDesativarNoFim)
             if (obj != null) obj.SetActive(false);
+    }
 
-        if (objetoDestaque != null)
-            objetoDestaque.SetActive(false);
+    // NOVA FUN«√O: Retorna qual È o GameObject principal que o indicador deve seguir
+    public GameObject GetAlvoPrincipal()
+    {
+        switch (tipo)
+        {
+            case TipoPasso.Clique:
+                return objetoClique;
+            case TipoPasso.Colisao:
+                return objetoA; // Em colisıes, vamos seguir o Objeto A por padr„o.
+            default:
+                return null;
+        }
     }
 }
