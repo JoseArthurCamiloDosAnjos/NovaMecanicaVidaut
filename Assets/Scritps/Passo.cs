@@ -25,32 +25,37 @@ public class Passo
     [Header("Objetos para Desativar ao Finalizar")]
     public GameObject[] objetosParaDesativarNoFim;
 
-    [Header("Destaque visual (opcional)")]
-    public GameObject objetoDestaque;
+    // REMOVEMOS A REFERÊNCIA AO SCRIPT DE ANIMAÇÃO DAQUI
 
     public void IniciarPasso()
     {
-        // Ativa/desativa logo ao iniciar
         foreach (var obj in objetosParaAtivarNoInicio)
             if (obj != null) obj.SetActive(true);
 
         foreach (var obj in objetosParaDesativarNoInicio)
             if (obj != null) obj.SetActive(false);
-
-        if (objetoDestaque != null)
-            objetoDestaque.SetActive(true);
     }
 
     public void FinalizarPasso()
     {
-        // Ativa/desativa só quando concluir
         foreach (var obj in objetosParaAtivarNoFim)
             if (obj != null) obj.SetActive(true);
 
         foreach (var obj in objetosParaDesativarNoFim)
             if (obj != null) obj.SetActive(false);
+    }
 
-        if (objetoDestaque != null)
-            objetoDestaque.SetActive(false);
+    // NOVA FUNÇÃO: Retorna qual é o GameObject principal que o indicador deve seguir
+    public GameObject GetAlvoPrincipal()
+    {
+        switch (tipo)
+        {
+            case TipoPasso.Clique:
+                return objetoClique;
+            case TipoPasso.Colisao:
+                return objetoA; // Em colisões, vamos seguir o Objeto A por padrão.
+            default:
+                return null;
+        }
     }
 }
