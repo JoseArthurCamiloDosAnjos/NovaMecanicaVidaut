@@ -1,128 +1,122 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Banheiro_Minigame : MonoBehaviour
 {
+    [Header("Configuração de Etapas e UI")]
+    public Etapa[] etapas;
     public Mecanica_Passo mecanica;
-    public Passo[] passos;
+    public GameObject seta;
+    public Vector3 offsetSeta = new Vector3(0, 1f, 0);
+    public bool setaLoopColisao = true;
+
+    private int etapaAtual = 0;
     private int passoAtual = 0;
+    private SeguirObjeto scriptSeta;
 
-    // ----- NOVAS VARIÁVEIS PARA CONTROLAR O INDICADOR -----
-    [Header("Configurações do Indicador Visual")]
-    [Tooltip("O objeto visual (seta, círculo) que será posicionado e animado.")]
-    public GameObject indicadorVisual;
-
-    [Tooltip("A distância que o indicador ficará do alvo.")]
-    public Vector3 offsetIndicador = new Vector3(0, 1.2f, 0);
-
-    [Tooltip("A altura da animação de 'sobe e desce'.")]
-    public float amplitudeAnimacao = 0.25f;
-
-    [Tooltip("A velocidade da animação.")]
-    public float velocidadeAnimacao = 2f;
-    // ----------------------------------------------------
+    void Awake()
+    {
+        if (seta != null)
+        {
+            scriptSeta = seta.GetComponent<SeguirObjeto>();
+            if (scriptSeta != null)
+                scriptSeta.offset = offsetSeta;
+        }
+    }
 
     void Start()
     {
-        // Garante que o indicador comece desligado
-        if (indicadorVisual != null)
+        if (etapas == null || etapas.Length == 0)
         {
-            indicadorVisual.SetActive(false);
-        }
-
-        if (passos.Length > 0)
-        {
-            passos[0].IniciarPasso();
-        }
-    }
-
-    // ----- NOVA FUNÇÃO: LATEUPDATE -----
-    // Usamos LateUpdate para garantir que o alvo já se moveu antes de posicionarmos o indicador.
-    void LateUpdate()
-    {
-        // Se o jogo acabou ou não há indicador, não faz nada.
-        if (passoAtual >= passos.Length || indicadorVisual == null)
-        {
-            if (indicadorVisual != null) indicadorVisual.SetActive(false); // Garante que ele suma no final
+            Debug.LogWarning("Nenhuma etapa configurada!");
             return;
         }
 
-        // Pega o alvo do passo atual
-        GameObject alvo = passos[passoAtual].GetAlvoPrincipal();
+        mecanica?.ConfigurarUI(etapas.Length);
 
-        // Se não houver um alvo para este passo, esconde o indicador.
-        if (alvo == null)
-        {
-            indicadorVisual.SetActive(false);
-            return;
-        }
+        etapaAtual = 0;
+        passoAtual = 0;
 
-        // Se havia um alvo, garante que o indicador está visível
-        if (!indicadorVisual.activeSelf)
-        {
-            indicadorVisual.SetActive(true);
-        }
-
-        // Calcula a posição e animação (lógica que estava no IndicadorAnimado.cs)
-        Vector3 posicaoBase = alvo.transform.position + offsetIndicador;
-        float deslocamentoY = Mathf.Sin(Time.time * velocidadeAnimacao) * amplitudeAnimacao;
-        indicadorVisual.transform.position = posicaoBase + new Vector3(0, deslocamentoY, 0);
+        IniciarEtapaAtual();
     }
-    // ------------------------------------
 
     void Update()
     {
-        if (passoAtual >= passos.Length) return;
+        if (etapaAtual >= etapas.Length) return;
 
-        Passo passo = passos[passoAtual];
+        var etapa = etapas[etapaAtual];
+        if (passoAtual >= etapa.passos.Length) return;
 
-        if (passo.tipo == Passo.TipoPasso.Clique && Input.GetMouseButtonDown(0))
+        Passo p = etapa.passos[passoAtual];
+
+        if (p.tipo == Passo.TipoPasso.Clique && Input.GetMouseButtonDown(0))
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
-
-            if (hit.collider != null && hit.collider.gameObject == passo.objetoClique)
-            {
+            if (hit.collider != null && hit.collider.gameObject == p.objetoClique)
                 ConcluirPasso();
-                Debug.Log($"Passo {passoAtual - 1} concluído (Clique)!");
-            }
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void IniciarEtapaAtual()
     {
-        if (passoAtual >= passos.Length) return;
-        Passo passo = passos[passoAtual];
-        if (passo.tipo == Passo.TipoPasso.Colisao)
+        var etapa = etapas[etapaAtual];
+        passoAtual = 0;
+
+        if (etapa.passos == null || etapa.passos.Length == 0)
         {
-            GameObject colisor = collision.collider.gameObject;
-            if ((colisor == passo.objetoA && collision.otherCollider.gameObject == passo.objetoB) ||
-                (colisor == passo.objetoB && collision.otherCollider.gameObject == passo.objetoA))
-            {
-                ConcluirPasso();
-                Debug.Log($"Passo {passoAtual - 1} concluído (Colisão)!");
-            }
+            Debug.LogWarning($"Etapa {etapaAtual} sem passos!");
+            AvancarEtapa();
+            return;
         }
+
+        etapa.passos[0].IniciarPasso();
+        mecanica?.MudarEtapa(etapaAtual);
+        AtualizarSetaParaPasso(etapa.passos[0]);
     }
 
     void ConcluirPasso()
     {
-        passos[passoAtual].FinalizarPasso();
-        mecanica.ProximoPasso();
+        var etapa = etapas[etapaAtual];
+        var passo = etapa.passos[passoAtual];
+
+        passo.FinalizarPasso();
         passoAtual++;
-        if (passoAtual < passos.Length)
+
+        if (passoAtual >= etapa.passos.Length)
         {
-            passos[passoAtual].IniciarPasso();
+            etapa.concluida = true;
+            mecanica?.MarcarEtapaConcluida(etapaAtual);
+            AvancarEtapa();
+        }
+        else
+        {
+            etapa.passos[passoAtual].IniciarPasso();
+            AtualizarSetaParaPasso(etapa.passos[passoAtual]);
         }
     }
 
-    public void VoltarPasso()
+    void AvancarEtapa()
     {
-        if (passoAtual > 0)
+        etapaAtual++;
+        if (etapaAtual >= etapas.Length)
         {
-            passos[passoAtual].FinalizarPasso();
-            passoAtual--;
-            mecanica.AtualizarParaPasso(passoAtual);
-            passos[passoAtual].IniciarPasso();
+            Debug.Log("🎉 Todas as etapas concluídas!");
+            if (seta != null) seta.SetActive(false);
+            return;
         }
+
+        IniciarEtapaAtual();
+    }
+
+    void AtualizarSetaParaPasso(Passo passo)
+    {
+        if (seta == null || scriptSeta == null || passo == null) return;
+        scriptSeta.DefinirAlvos(
+            passo.objetoClique?.transform ?? passo.objetoA?.transform,
+            passo.objetoB?.transform,
+            true, setaLoopColisao, true
+        );
+        seta.SetActive(true);
     }
 }
