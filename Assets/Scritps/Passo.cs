@@ -25,37 +25,46 @@ public class Passo
     [Header("Objetos para Desativar ao Finalizar")]
     public GameObject[] objetosParaDesativarNoFim;
 
-    // REMOVEMOS A REFERÊNCIA AO SCRIPT DE ANIMAÇÃO DAQUI
+    [Header("Destaque visual (opcional)")]
+    public GameObject objetoDestaque;
+
+    [HideInInspector] public bool concluido = false;
 
     public void IniciarPasso()
     {
-        foreach (var obj in objetosParaAtivarNoInicio)
-            if (obj != null) obj.SetActive(true);
+        NormalizarAlvos();
 
-        foreach (var obj in objetosParaDesativarNoInicio)
-            if (obj != null) obj.SetActive(false);
+        if (objetosParaAtivarNoInicio != null)
+            foreach (var obj in objetosParaAtivarNoInicio) if (obj != null) obj.SetActive(true);
+
+        if (objetosParaDesativarNoInicio != null)
+            foreach (var obj in objetosParaDesativarNoInicio) if (obj != null) obj.SetActive(false);
+
+        if (objetoDestaque != null) objetoDestaque.SetActive(true);
     }
 
     public void FinalizarPasso()
     {
-        foreach (var obj in objetosParaAtivarNoFim)
-            if (obj != null) obj.SetActive(true);
+        if (objetosParaAtivarNoFim != null)
+            foreach (var obj in objetosParaAtivarNoFim) if (obj != null) obj.SetActive(true);
 
-        foreach (var obj in objetosParaDesativarNoFim)
-            if (obj != null) obj.SetActive(false);
+        if (objetosParaDesativarNoFim != null)
+            foreach (var obj in objetosParaDesativarNoFim) if (obj != null) obj.SetActive(false);
+
+        if (objetoDestaque != null) objetoDestaque.SetActive(false);
+
+        concluido = true;
     }
 
-    // NOVA FUNÇÃO: Retorna qual é o GameObject principal que o indicador deve seguir
-    public GameObject GetAlvoPrincipal()
+    public void NormalizarAlvos()
     {
-        switch (tipo)
+        if (objetoA != null && objetoB != null && objetoA == objetoB)
+            objetoB = null;
+
+        if (tipo == TipoPasso.Clique)
         {
-            case TipoPasso.Clique:
-                return objetoClique;
-            case TipoPasso.Colisao:
-                return objetoA; // Em colisões, vamos seguir o Objeto A por padrão.
-            default:
-                return null;
+            objetoA = null;
+            objetoB = null;
         }
     }
 }
