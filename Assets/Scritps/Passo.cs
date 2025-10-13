@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [System.Serializable]
 public class Passo
@@ -9,7 +9,7 @@ public class Passo
     [Header("Para Clique")]
     public GameObject objetoClique;
 
-    [Header("Para Colis�o")]
+    [Header("Para Colisão")]
     public GameObject objetoA;
     public GameObject objetoB;
 
