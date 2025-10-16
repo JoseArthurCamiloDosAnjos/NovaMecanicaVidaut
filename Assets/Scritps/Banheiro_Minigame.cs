@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Banheiro_Minigame : MonoBehaviour
 {
@@ -9,10 +11,11 @@ public class Banheiro_Minigame : MonoBehaviour
     public GameObject seta;
     public Vector3 offsetSeta = new Vector3(0, 1f, 0);
     public bool setaLoopColisao = true;
-
+   
     private int etapaAtual = 0;
     private int passoAtual = 0;
     private SeguirObjeto scriptSeta;
+    public Button botaoFinal;
 
     void Awake()
     {
@@ -56,6 +59,15 @@ public class Banheiro_Minigame : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == p.objetoClique)
                 ConcluirPasso();
         }
+        if (p.concluido)
+        {
+            botaoFinal.gameObject.SetActive(true);
+        }
+        else
+        {
+            botaoFinal.gameObject.SetActive(false);
+        }
+
     }
 
     void IniciarEtapaAtual()
@@ -82,7 +94,7 @@ public class Banheiro_Minigame : MonoBehaviour
 
         passo.FinalizarPasso();
         passoAtual++;
-
+        
         if (passoAtual >= etapa.passos.Length)
         {
             etapa.concluida = true;
@@ -112,11 +124,51 @@ public class Banheiro_Minigame : MonoBehaviour
     void AtualizarSetaParaPasso(Passo passo)
     {
         if (seta == null || scriptSeta == null || passo == null) return;
-        scriptSeta.DefinirAlvos(
-            passo.objetoClique?.transform ?? passo.objetoA?.transform,
-            passo.objetoB?.transform,
-            true, setaLoopColisao, true
-        );
+
+        Transform inicio = null;
+        Transform fim = null;
+        bool arrastar = false;
+
+        switch (passo.tipo)
+        {
+            case Passo.TipoPasso.Clique:
+                inicio = passo.objetoClique?.transform;
+                break;
+
+            case Passo.TipoPasso.Colisao:
+                inicio = passo.objetoA?.transform;
+                fim = passo.objetoB?.transform;
+                arrastar = true;
+                break;
+
+            case Passo.TipoPasso.Arrastar:
+                inicio = passo.objetoArrastavel?.transform;
+                fim = passo.destinoArrastar?.transform;
+                arrastar = true;
+                break;
+        }
+
+        scriptSeta.DefinirAlvos(inicio, fim, arrastar, setaLoopColisao, true);
         seta.SetActive(true);
+    }
+
+    void OnEnable()
+    {
+        DragItem.OnObjetoArrastadoCorretamente += VerificarArraste;
+    }
+
+    void OnDisable()
+    {
+        DragItem.OnObjetoArrastadoCorretamente -= VerificarArraste;
+    }
+
+    void VerificarArraste(GameObject objeto)
+    {
+        var etapa = etapas[etapaAtual];
+        if (passoAtual >= etapa.passos.Length) return;
+
+        Passo p = etapa.passos[passoAtual];
+        if (p.tipo == Passo.TipoPasso.Arrastar && p.objetoArrastavel == objeto)
+            ConcluirPasso();
     }
 }

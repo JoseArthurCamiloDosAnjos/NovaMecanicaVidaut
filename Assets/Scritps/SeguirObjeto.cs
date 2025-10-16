@@ -15,27 +15,10 @@ public class SeguirObjeto : MonoBehaviour
 
     public float amplitude = 0.5f;
     public float velocidadeSobeDesce = 1f;
-    public Vector3 offset = new Vector3(0, 20f, 0);
+    public Vector3 offset = new Vector3(0, 1f, 0);
     public float suavizacaoPosicao = 10f;
 
     private Coroutine arrasteCoroutine;
-    private bool bloqueadoParaDesativar = false;
-
-    // Pendências quando StartArrasteForce é chamado enquanto o componente está desativado
-    private bool pendingStartArraste = false;
-    private bool pendingLoop = false;
-
-    void OnEnable()
-    {
-        if (alvoInicio != null)
-            transform.position = alvoInicio.position + offset;
-
-        if (pendingStartArraste)
-        {
-            pendingStartArraste = false;
-            StartArrasteForce(pendingLoop);
-        }
-    }
 
     void Update()
     {
@@ -44,13 +27,11 @@ public class SeguirObjeto : MonoBehaviour
         if (usarArrastar && alvoFim != null)
         {
             if (arrasteCoroutine == null)
-            {
-                Debug.Log("[SeguirObjeto] Iniciando coroutine de arraste A->B");
                 arrasteCoroutine = StartCoroutine(LoopAparaB(alvoInicio, alvoFim));
-            }
             return;
         }
 
+        // Movimento normal (seguir alvoInicio com flutuação)
         Vector3 alvoPos = alvoInicio.position + offset;
         float yOffset = Mathf.Sin(Time.time * velocidadeSobeDesce) * amplitude;
         Vector3 destino = alvoPos + new Vector3(0, yOffset, 0);
@@ -59,57 +40,29 @@ public class SeguirObjeto : MonoBehaviour
 
     IEnumerator LoopAparaB(Transform inicioT, Transform fimT)
     {
-        Debug.Log("[SeguirObjeto] LoopAparaB started");
-        while (usarArrastar && inicioT != null && fimT != null)
+        // anima de A até B
+        yield return StartCoroutine(AnimarDePara(inicioT, fimT, tempoArrastar));
+
+        // pausa em B
+        float tAcum = 0f;
+        while (tAcum < pausaEmB)
         {
-            Vector3 posA = inicioT.position + offset;
-            if (Vector3.Distance(transform.position, posA) > 0.001f)
-                transform.position = Vector3.Lerp(transform.position, posA, 0.5f);
-
-            yield return StartCoroutine(AnimarDePara(inicioT, fimT, tempoArrastar));
-
-            float tAcum = 0f;
-            while (tAcum < pausaEmB)
-            {
-                if (fimT == null) break;
-                tAcum += Time.deltaTime;
-                Vector3 alvoPos = fimT.position + offset;
-                float yOffset = Mathf.Sin(Time.time * velocidadeSobeDesce) * amplitude;
-                transform.position = Vector3.Lerp(transform.position, alvoPos + new Vector3(0, yOffset, 0), Time.deltaTime * suavizacaoPosicao);
-                yield return null;
-            }
-
-            if (!loopArraste) break;
-
-            Vector3 destinoA = inicioT.position + offset;
-            if (tempoRetornoParaA <= 0f)
-            {
-                transform.position = destinoA;
-            }
-            else
-            {
-                float t = 0f;
-                Vector3 start = transform.position;
-                while (t < tempoRetornoParaA)
-                {
-                    t += Time.deltaTime;
-                    float p = Mathf.Clamp01(t / tempoRetornoParaA);
-                    transform.position = Vector3.Lerp(start, destinoA, Mathf.SmoothStep(0f, 1f, p));
-                    yield return null;
-                }
-                transform.position = destinoA;
-            }
-
+            tAcum += Time.deltaTime;
+            Vector3 alvoPos = fimT.position + offset;
+            float yOffset = Mathf.Sin(Time.time * velocidadeSobeDesce) * amplitude;
+            transform.position = Vector3.Lerp(transform.position, alvoPos + new Vector3(0, yOffset, 0), Time.deltaTime * suavizacaoPosicao);
             yield return null;
         }
 
-        arrasteCoroutine = null;
-        Debug.Log("[SeguirObjeto] LoopAparaB ended");
-
-        if (fimT != null && inicioT != null)
+        // se loopar, volta para A
+        if (loopArraste)
         {
-            alvoInicio = fimT;
-            alvoFim = null;
+            yield return StartCoroutine(AnimarDePara(fimT, inicioT, tempoRetornoParaA));
+            arrasteCoroutine = StartCoroutine(LoopAparaB(inicioT, fimT));
+        }
+        else
+        {
+            arrasteCoroutine = null;
             usarArrastar = false;
         }
     }
@@ -131,15 +84,9 @@ public class SeguirObjeto : MonoBehaviour
         transform.position = end;
     }
 
-    // DefinirAlvos com forceRestart
+    // 🔹 Método compatível com Banheiro_Minigame
     public void DefinirAlvos(Transform inicio, Transform fim = null, bool arrastar = false, bool loop = false, bool forceRestart = false)
     {
-        bool mesmaSituacao = (alvoInicio == inicio) && (alvoFim == fim) && (usarArrastar == arrastar) && (loopArraste == loop);
-
-        if (mesmaSituacao && arrasteCoroutine != null && !forceRestart) return;
-
-        bloqueadoParaDesativar = true;
-
         if (arrasteCoroutine != null)
         {
             StopCoroutine(arrasteCoroutine);
@@ -152,27 +99,19 @@ public class SeguirObjeto : MonoBehaviour
         loopArraste = loop;
 
         if (alvoInicio != null)
-            transform.position = Vector3.Lerp(transform.position, alvoInicio.position + offset, 0.5f);
+            transform.position = alvoInicio.position + offset;
 
-        StartCoroutine(LiberarBloqueioDesativacao());
+        if (usarArrastar && alvoFim != null)
+            arrasteCoroutine = StartCoroutine(LoopAparaB(alvoInicio, alvoFim));
     }
 
-    // StartArrasteForce agora robusto: enfileira se componente estiver inativo; aceita loop
-    public void StartArrasteForce(bool loop = false)
+    // 🔹 Método compatível com Passo.cs
+    public void SeguirTransform(Transform novoAlvo)
     {
-        if (!this.isActiveAndEnabled)
-        {
-            pendingStartArraste = true;
-            pendingLoop = loop;
-            Debug.Log("[SeguirObjeto] StartArrasteForce enfileirado porque componente inativo (loop=" + loop + ")");
-            return;
-        }
-
-        if (alvoInicio == null || alvoFim == null)
-        {
-            Debug.LogWarning("[SeguirObjeto] StartArrasteForce abortado: alvoInicio ou alvoFim nulos");
-            return;
-        }
+        alvoInicio = novoAlvo;
+        alvoFim = null;
+        usarArrastar = false;
+        loopArraste = false;
 
         if (arrasteCoroutine != null)
         {
@@ -180,18 +119,11 @@ public class SeguirObjeto : MonoBehaviour
             arrasteCoroutine = null;
         }
 
-        usarArrastar = true;
-        loopArraste = loop;
-        arrasteCoroutine = StartCoroutine(LoopAparaB(alvoInicio, alvoFim));
-        Debug.Log("[SeguirObjeto] StartArrasteForce: coroutine iniciada (loop=" + loop + ")");
+        if (alvoInicio != null)
+            transform.position = alvoInicio.position + offset;
     }
 
-    IEnumerator LiberarBloqueioDesativacao()
-    {
-        yield return null;
-        bloqueadoParaDesativar = false;
-    }
-
+    // 🔹 Método compatível com Passo.cs (FinalizarPasso chama isso)
     public void PararEEsconder()
     {
         StopAllCoroutines();
@@ -200,12 +132,8 @@ public class SeguirObjeto : MonoBehaviour
         alvoFim = null;
         usarArrastar = false;
         loopArraste = false;
-        pendingStartArraste = false;
-        pendingLoop = false;
-    }
 
-    public bool PodeSerDesativada()
-    {
-        return !bloqueadoParaDesativar && arrasteCoroutine == null;
+        // opcional: esconder o objeto seguidor
+        gameObject.SetActive(false);
     }
 }

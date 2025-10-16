@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class Mecanica_Passo : MonoBehaviour
 {
+       
+       
     [Header("UI de Etapas")]
     public Toggle[] listaToggles;         // Cada toggle representa uma ETAPA
     public GameObject[] imagensConclusao; // Ícone de "etapa concluída"
@@ -13,6 +15,7 @@ public class Mecanica_Passo : MonoBehaviour
     private bool[] etapasConcluidas;
     private int etapaAtual = 0;
 
+    public Button botaoFinal;
     void Start()
     {
         if (bMinigame == null)
@@ -38,8 +41,6 @@ public class Mecanica_Passo : MonoBehaviour
 
         AtualizarUI();
     }
-
-   
 
     public void MudarEtapa(int indice)
     {
