@@ -3,95 +3,120 @@ using UnityEngine.UI;
 
 public class Mecanica_Passo : MonoBehaviour
 {
-    [Header("UI de Progresso")]
-    public Toggle[] listaToggles;         // Arraste todos os Toggles (checkboxes)
-    public GameObject[] imagensConclusao; // Arraste os ícones de concluído
-    public ToggleGroup grupo;             // ToggleGroup
+                         
+    [Header("UI de Etapas")]
+    public Toggle[] listaToggles;         // Cada toggle representa uma ETAPA
+    public GameObject[] imagensConclusao; // Ícone de "etapa concluída"
 
     [Header("Referências")]
-    public Banheiro_Minigame bMinigame;     // Arraste o objeto com o script Banheiro_Minigame aqui
+    public Banheiro_Minigame bMinigame;   // Referência ao controlador principal
 
- 
+    private bool[] etapasConcluidas;
+    private int etapaAtual = 0;
 
-    private bool[] passosConcluidos;
-    private int passoAtual = 0;
-
+    public Button botaoFinal;
     void Start()
     {
-        // Tenta encontrar a referência do minigame se não foi arrastada no Inspector
         if (bMinigame == null)
-        {
             bMinigame = FindObjectOfType<Banheiro_Minigame>();
+
+        if (listaToggles == null || listaToggles.Length == 0)
+        {
+            Debug.LogWarning("Nenhum Toggle configurado para etapas.");
+            return;
         }
 
-        int quantidade = listaToggles.Length;
-        passosConcluidos = new bool[quantidade];
+        etapasConcluidas = new bool[listaToggles.Length];
 
-        for (int i = 0; i < quantidade; i++)
+        // 🔒 Inicia com só o primeiro toggle liberado
+        for (int i = 0; i < listaToggles.Length; i++)
         {
-            int index = i;
+            listaToggles[i].isOn = false;
+            listaToggles[i].interactable = (i == 0);
 
-            if (imagensConclusao[index] != null)
-                imagensConclusao[index].SetActive(false);
+            if (imagensConclusao != null && i < imagensConclusao.Length && imagensConclusao[i] != null)
+                imagensConclusao[i].SetActive(false);
+        }
 
-            listaToggles[i].onValueChanged.AddListener((bool ligado) =>
+        AtualizarUI();
+    }
+
+    public void MudarEtapa(int indice)
+    {
+        // ✅ Só permite mudar se for para uma etapa anterior ou atual
+        if (indice <= etapaAtual && indice >= 0)
+        {
+            etapaAtual = indice;
+            AtualizarUI();
+        }
+    }
+
+    public void MarcarEtapaConcluida(int indice)
+    {
+        if (indice < 0 || indice >= etapasConcluidas.Length)
+            return;
+
+        etapasConcluidas[indice] = true;
+
+        // ✅ Libera o próximo toggle, se existir
+        if (indice + 1 < listaToggles.Length)
+            listaToggles[indice + 1].interactable = true;
+
+        // ✅ Atualiza etapa atual para o próximo automaticamente
+        etapaAtual = Mathf.Min(indice + 1, listaToggles.Length - 1);
+
+        AtualizarUI();
+    }
+    public void ConfigurarUI(int totalEtapas)
+    {
+        // 🔒 Garante que não vamos além do número de toggles disponíveis
+        int etapasValidas = Mathf.Min(totalEtapas, listaToggles.Length);
+
+        etapasConcluidas = new bool[etapasValidas];
+        etapaAtual = 0;
+
+        // 🔒 Desativa todos os toggles extras se existirem
+        for (int i = 0; i < listaToggles.Length; i++)
+        {
+            bool dentroDoLimite = i < etapasValidas;
+            listaToggles[i].gameObject.SetActive(dentroDoLimite);
+
+            if (dentroDoLimite)
             {
-                if (ligado)
-                {
-                    // Lógica para pular entre os passos (se necessário)
-                    // Esta parte pode ser ajustada dependendo do comportamento desejado
-                }
-            });
-        }
-        AtualizarUI();
-    }
+                listaToggles[i].isOn = false;
+                listaToggles[i].interactable = (i == 0);
+            }
 
-    public void ProximoPasso()
-    {
-        if (passoAtual < passosConcluidos.Length)
-        {
-            passosConcluidos[passoAtual] = true;
+            if (imagensConclusao != null && i < imagensConclusao.Length && imagensConclusao[i] != null)
+                imagensConclusao[i].SetActive(false);
         }
 
-        if (passoAtual + 1 < listaToggles.Length)
-        {
-            passoAtual++;
-        }
-        AtualizarUI();
-    }
-
-    // ATUALIZAÇÃO: Este método é chamado por um botão na UI para INICIAR o processo de voltar
-    public void PassoAnterior()
-    {
-        // Ele apenas chama o método principal no script do minigame.
-        if (bMinigame != null)
-        {
-            bMinigame.VoltarPasso();
-        }
-    }
-
-    // ATUALIZAÇÃO: Novo método para ser controlado pelo Banheiro_Minigame
-    // Sincroniza a UI com o estado atual do jogo quando um passo é voltado.
-    public void AtualizarParaPasso(int novoPasso)
-    {
-        passoAtual = novoPasso;
-        passosConcluidos[passoAtual] = false; // Desmarca o passo como concluído
         AtualizarUI();
     }
 
     void AtualizarUI()
     {
-        for (int i = 0; i < listaToggles.Length; i++)
+        if (listaToggles == null || listaToggles.Length == 0 || etapasConcluidas == null)
+            return;
+
+        int total = Mathf.Min(listaToggles.Length, etapasConcluidas.Length);
+
+        for (int i = 0; i < total; i++)
         {
-            listaToggles[i].isOn = (i == passoAtual);
+            bool etapaConcluida = etapasConcluidas[i];
+            bool etapaAtualAtiva = (i == etapaAtual);
 
-            // Permite clicar nos passos já concluídos para revisitá-los (opcional)
-            listaToggles[i].interactable = passosConcluidos[i] || (i == passoAtual);
+            listaToggles[i].isOn =  etapaAtualAtiva;
 
-            if (imagensConclusao.Length > i && imagensConclusao[i] != null)
-                imagensConclusao[i].SetActive(passosConcluidos[i]);
+            if (i == 0)
+                listaToggles[i].interactable = true;
+            else if (etapaConcluida || (i > 0 && etapasConcluidas[i - 1]))
+                listaToggles[i].interactable = true;
+            else
+                listaToggles[i].interactable = false;
+
+            if (imagensConclusao != null && i < imagensConclusao.Length && imagensConclusao[i] != null)
+                imagensConclusao[i].SetActive(etapaConcluida);
         }
     }
-
-
 }
