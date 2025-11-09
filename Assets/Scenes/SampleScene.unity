@@ -252,6 +252,7 @@ RectTransform:
   - {fileID: 1463518111}
   - {fileID: 1897333367}
   - {fileID: 944872770}
+  - {fileID: 1770563191}
   m_Father: {fileID: 1772082387}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3640,6 +3641,134 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 72.086, y: 92.647964}
   m_EdgeRadius: 0
+--- !u!1 &1359370152
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1359370154}
+  - component: {fileID: 1359370153}
+  m_Layer: 0
+  m_Name: GameManager_Audio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1359370153
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359370152}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 28780010b09a09948a94503480840e02, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &1359370154
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359370152}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.16039327, y: -0.8706181, z: 0.048147887}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1370927337
 GameObject:
   m_ObjectHideFlags: 0
@@ -3858,7 +3987,7 @@ MonoBehaviour:
   - {fileID: 1370927337}
   - {fileID: 1929084071}
   bMinigame: {fileID: 1398353059}
-  botaoFinal: {fileID: 0}
+  botaoFinal: {fileID: 944872771}
 --- !u!114 &1398353059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3871,6 +4000,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e1c0318145ead4f94c0194bbc37a1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fonteAudio: {fileID: 1359370153}
+  textoUI: {fileID: 1457744552}
   etapas:
   - nomeEtapa: escova
     passos:
@@ -3889,6 +4020,12 @@ MonoBehaviour:
       - {fileID: 1206342800}
       objetoDestaque: {fileID: 0}
       concluido: 0
+      audiosPasso:
+      - {fileID: 8300000, guid: c4ae2dc31ced2454f90f8e55be94f818, type: 3}
+      textosPasso:
+      - "Primeiro, pegue a escova de dentes que est\xE1 dentro do copo. Segure-a
+        com cuidado."
+      delayEntreFalas: 1
     - tipo: 2
       objetoClique: {fileID: 1206342800}
       objetoA: {fileID: 0}
@@ -3904,6 +4041,28 @@ MonoBehaviour:
       - {fileID: 1206342800}
       objetoDestaque: {fileID: 1293276227}
       concluido: 0
+      audiosPasso:
+      - {fileID: 8300000, guid: a5a2e80185799124e970af5f89e4b241, type: 3}
+      textosPasso:
+      - "Agora, leve a escova at\xE9 o local indicado na mesa e coloque-a ali."
+      delayEntreFalas: 1
+    audiosIntroducao:
+    - {fileID: 8300000, guid: 6c263f1bfa40c0842bda754238418932, type: 3}
+    - {fileID: 8300000, guid: d25f82bde731447409530afe058ff621, type: 3}
+    - {fileID: 8300000, guid: 54e69b9fc4225c64baf000cbf7ab8bde, type: 3}
+    - {fileID: 8300000, guid: 517b7047d4368ac41bb17bd5dd71588e, type: 3}
+    - {fileID: 8300000, guid: c65b996e509c60c4bb904406d2c3238d, type: 3}
+    - {fileID: 8300000, guid: c4ae2dc31ced2454f90f8e55be94f818, type: 3}
+    textosIntroducao:
+    - "Ol\xE1!"
+    - Agora vamos aprender, juntos, a escovar os dentes.
+    - "Escovar os dentes \xE9 uma forma muito importante de cuidar de voc\xEA e do
+      seu sorriso."
+    - Vamos fazer tudo com calma, passo a passo.
+    - "Vamos come\xE7ar?"
+    - "Primeiro, pegue a escova de dentes que est\xE1 dentro do copo. Segure-a com
+      cuidado."
+    delayEntreFalas: 0.5
     concluida: 0
   - nomeEtapa: pasta
     passos:
@@ -3922,6 +4081,16 @@ MonoBehaviour:
       - {fileID: 1710860059}
       objetoDestaque: {fileID: 0}
       concluido: 0
+      audiosPasso: []
+      textosPasso: []
+      delayEntreFalas: 1
+    audiosIntroducao:
+    - {fileID: 8300000, guid: 3ec90dcd0db8393429d6b9871584e667, type: 3}
+    - {fileID: 8300000, guid: fb2fadb51aa11e942b2bd8666e5f88c1, type: 3}
+    textosIntroducao:
+    - "Excelente. Voc\xEA colocou a escova no lugar certinho!"
+    - "Agora, pegue a pasta de dente que est\xE1 dentro do copo. Pegue com calma."
+    delayEntreFalas: 1
     concluida: 0
   - nomeEtapa: pia
     passos:
@@ -3940,6 +4109,12 @@ MonoBehaviour:
       - {fileID: 1206342800}
       objetoDestaque: {fileID: 0}
       concluido: 0
+      audiosPasso: []
+      textosPasso: []
+      delayEntreFalas: 1
+    audiosIntroducao: []
+    textosIntroducao: []
+    delayEntreFalas: 1
     concluida: 0
   mecanica: {fileID: 1398353058}
   seta: {fileID: 1293276227}
@@ -4099,6 +4274,86 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1411588022}
+  m_CullTransparentMesh: 1
+--- !u!1 &1457744550
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1457744551}
+  - component: {fileID: 1457744553}
+  - component: {fileID: 1457744552}
+  m_Layer: 0
+  m_Name: Txt_Dialog
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1457744551
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457744550}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1770563191}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -0.0000038146973}
+  m_SizeDelta: {x: 1017.1, y: 248.84}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1457744552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457744550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 65
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 65
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: New Text
+--- !u!222 &1457744553
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457744550}
   m_CullTransparentMesh: 1
 --- !u!1 &1463518110
 GameObject:
@@ -5003,6 +5258,83 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1731682766}
+  m_CullTransparentMesh: 1
+--- !u!1 &1770563190
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1770563191}
+  - component: {fileID: 1770563193}
+  - component: {fileID: 1770563192}
+  m_Layer: 0
+  m_Name: Caixa_Dialogo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1770563191
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770563190}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1457744551}
+  m_Father: {fileID: 151263093}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1, y: -335.22003}
+  m_SizeDelta: {x: 1017.08, y: 248.84}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1770563192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770563190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.6509434, g: 0.5402026, b: 0.3469651, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1770563193
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770563190}
   m_CullTransparentMesh: 1
 --- !u!1 &1772082386
 GameObject:

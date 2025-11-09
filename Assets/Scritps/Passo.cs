@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 [System.Serializable]
 public class Passo
@@ -39,6 +40,11 @@ public class Passo
 
     private Banheiro_Minigame Bg;
 
+
+    [Header("Falas e Áudio do Passo")]
+    public AudioClip[] audiosPasso;
+    [TextArea(2, 5)] public string[] textosPasso;
+    public float delayEntreFalas = 1f;
     public void IniciarPasso()
     {
         
@@ -112,6 +118,28 @@ public class Passo
             objetoA = null;
             objetoB = null;
             objetoClique = null;
+        }
+
+    }
+    public IEnumerator ReproduzirFalas(AudioSource fonte, Text textoUI)
+    {
+        if (audiosPasso == null || textosPasso == null)
+            yield break;
+
+        int total = Mathf.Min(audiosPasso.Length, textosPasso.Length);
+        for (int i = 0; i < total; i++)
+        {
+            if (textoUI != null)
+                textoUI.text = textosPasso[i];
+
+            if (fonte != null && audiosPasso[i] != null)
+            {
+                fonte.clip = audiosPasso[i];
+                fonte.Play();
+                yield return new WaitForSeconds(fonte.clip.length + delayEntreFalas);
+            }
+            else
+                yield return new WaitForSeconds(delayEntreFalas);
         }
     }
 }

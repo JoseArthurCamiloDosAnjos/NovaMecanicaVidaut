@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class Banheiro_Minigame : MonoBehaviour
 {
+    [Header("Sistema de Áudio e Diálogo")]
+    public AudioSource fonteAudio;
+    public Text textoUI; // texto que mostra o diálogo
+  
     [Header("Configuração de Etapas e UI")]
     public Etapa[] etapas;
     public Mecanica_Passo mecanica;
@@ -16,19 +20,23 @@ public class Banheiro_Minigame : MonoBehaviour
     private int passoAtual = 0;
     private SeguirObjeto scriptSeta;
     public Button botaoFinal;
+    public static Banheiro_Minigame Instance;
 
     void Awake()
     {
+        Instance = this;
         if (seta != null)
         {
             scriptSeta = seta.GetComponent<SeguirObjeto>();
             if (scriptSeta != null)
                 scriptSeta.offset = offsetSeta;
         }
+
     }
 
     void Start()
     {
+        
         if (etapas == null || etapas.Length == 0)
         {
             Debug.LogWarning("Nenhuma etapa configurada!");
@@ -82,9 +90,22 @@ public class Banheiro_Minigame : MonoBehaviour
             return;
         }
 
-        etapa.passos[0].IniciarPasso();
         mecanica?.MudarEtapa(etapaAtual);
+
+        // ✅ Reproduz a introdução da etapa (áudio + texto)
+        etapa.IniciarEtapa(this, fonteAudio, textoUI);
+
         AtualizarSetaParaPasso(etapa.passos[0]);
+    }
+    void IniciarProximoPasso()
+    {
+        var etapa = etapas[etapaAtual];
+        if (passoAtual < etapa.passos.Length)
+        {
+            var passo = etapa.passos[passoAtual];
+            StartCoroutine(passo.ReproduzirFalas(fonteAudio, textoUI));
+            AtualizarSetaParaPasso(passo);
+        }
     }
 
     void ConcluirPasso()
@@ -105,7 +126,9 @@ public class Banheiro_Minigame : MonoBehaviour
         {
             etapa.passos[passoAtual].IniciarPasso();
             AtualizarSetaParaPasso(etapa.passos[passoAtual]);
+            IniciarProximoPasso(); // ✅ adiciona essa linha
         }
+
     }
 
     void AvancarEtapa()
@@ -121,8 +144,8 @@ public class Banheiro_Minigame : MonoBehaviour
         IniciarEtapaAtual();
     }
 
-    void AtualizarSetaParaPasso(Passo passo)
-    {
+    public void AtualizarSetaParaPasso(Passo passo)
+           {
         if (seta == null || scriptSeta == null || passo == null) return;
 
         Transform inicio = null;

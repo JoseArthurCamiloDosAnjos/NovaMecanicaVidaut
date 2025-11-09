@@ -3,8 +3,7 @@ using UnityEngine.UI;
 
 public class Mecanica_Passo : MonoBehaviour
 {
-       
-       
+                         
     [Header("UI de Etapas")]
     public Toggle[] listaToggles;         // Cada toggle representa uma ETAPA
     public GameObject[] imagensConclusao; // Ícone de "etapa concluída"
