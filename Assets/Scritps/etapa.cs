@@ -1,15 +1,15 @@
-ï»¿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 [System.Serializable]
 public class Etapa
 {
-    [Header("Nome e ConfiguraÃ§Ã£o da Etapa")]
+    [Header("Nome e Configuração da Etapa")]
     public string nomeEtapa;
     public Passo[] passos;
 
-    [Header("Falas de introduÃ§Ã£o da etapa")]
+    [Header("Falas de introdução da etapa")]
     public AudioClip[] audiosIntroducao;
     [TextArea(2, 5)]
     public string[] textosIntroducao;
@@ -29,15 +29,15 @@ public class Etapa
         return true;
     }
 
-    // ðŸ”§ NOVO MÃ‰TODO â€” compatÃ­vel com chamada antiga
+    // ?? NOVO MÉTODO — compatível com chamada antiga
     public void IniciarEtapa()
     {
-        // Chamada padrÃ£o antiga, sem Ã¡udio/texto
+        // Chamada padrão antiga, sem áudio/texto
         if (passos == null || passos.Length == 0) return;
         passos[0].IniciarPasso();
     }
 
-    // ðŸ”§ SOBRECARGA â€” usada pelo Banheiro_Minigame com 3 parÃ¢metros
+    // ?? SOBRECARGA — usada pelo Banheiro_Minigame com 3 parâmetros
     public void IniciarEtapa(MonoBehaviour contexto, AudioSource fonteAudio, Text textoUI)
     {
         contexto.StartCoroutine(ReproduzirIntroducao(fonteAudio, textoUI));
