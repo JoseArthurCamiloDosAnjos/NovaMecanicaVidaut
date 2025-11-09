@@ -1,17 +1,25 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 [System.Serializable]
 public class Passo
 {
-    public enum TipoPasso { Clique, Colisao }
+    
+    public enum TipoPasso { Clique, Colisao, Arrastar }
     public TipoPasso tipo;
+    private Banheiro_Minigame banheiroMinigame;
 
     [Header("Para Clique")]
     public GameObject objetoClique;
 
-    [Header("Para Colis„o")]
+    [Header("Para Colis√£o")]
     public GameObject objetoA;
     public GameObject objetoB;
+
+    [Header("Para Arrastar")]
+    public GameObject objetoArrastavel;
+    public GameObject destinoArrastar;
 
     [Header("Objetos para Ativar ao Iniciar")]
     public GameObject[] objetosParaAtivarNoInicio;
@@ -25,37 +33,113 @@ public class Passo
     [Header("Objetos para Desativar ao Finalizar")]
     public GameObject[] objetosParaDesativarNoFim;
 
-    // REMOVEMOS A REFER NCIA AO SCRIPT DE ANIMA«√O DAQUI
+    [Header("Destaque visual (opcional)")]
+    public GameObject objetoDestaque;
 
+    [HideInInspector] public bool concluido = false;
+
+    private Banheiro_Minigame Bg;
+
+
+    [Header("Falas e √Åudio do Passo")]
+    public AudioClip[] audiosPasso;
+    [TextArea(2, 5)] public string[] textosPasso;
+    public float delayEntreFalas = 1f;
     public void IniciarPasso()
     {
-        foreach (var obj in objetosParaAtivarNoInicio)
-            if (obj != null) obj.SetActive(true);
+        
+        NormalizarAlvos();
 
-        foreach (var obj in objetosParaDesativarNoInicio)
-            if (obj != null) obj.SetActive(false);
+        if (objetosParaAtivarNoInicio != null)
+            foreach (var obj in objetosParaAtivarNoInicio)
+                if (obj != null) obj.SetActive(true);
+
+        if (objetosParaDesativarNoInicio != null)
+            foreach (var obj in objetosParaDesativarNoInicio)
+                if (obj != null) obj.SetActive(false);
+
+        if (objetoDestaque != null) objetoDestaque.SetActive(true);
+
+        if (tipo == TipoPasso.Arrastar && objetoArrastavel != null)
+        {
+            var drag = objetoArrastavel.GetComponent<DragItem>();
+            if (drag != null)
+                drag.HabilitarArraste(true, destinoArrastar);
+
+            var seguidor = objetoArrastavel.GetComponent<SeguirObjeto>();
+            if (seguidor != null)
+                seguidor.SeguirTransform(objetoArrastavel.transform);
+        }
+ 
     }
 
     public void FinalizarPasso()
     {
-        foreach (var obj in objetosParaAtivarNoFim)
-            if (obj != null) obj.SetActive(true);
+        if (objetosParaAtivarNoFim != null)
+            foreach (var obj in objetosParaAtivarNoFim)
+                if (obj != null) obj.SetActive(true);
 
-        foreach (var obj in objetosParaDesativarNoFim)
-            if (obj != null) obj.SetActive(false);
+        if (objetosParaDesativarNoFim != null)
+            foreach (var obj in objetosParaDesativarNoFim)
+                if (obj != null) obj.SetActive(false);
+
+        if (objetoDestaque != null)
+            objetoDestaque.SetActive(false);
+
+        if (tipo == TipoPasso.Arrastar && objetoArrastavel != null)
+        {
+            var drag = objetoArrastavel.GetComponent<DragItem>();
+            if (drag != null)
+                drag.HabilitarArraste(false, null);
+
+            var seguidor = objetoArrastavel.GetComponent<SeguirObjeto>();
+            if (seguidor != null)
+                seguidor.PararEEsconder();
+        }
+       
+      
+        concluido = true;
     }
 
-    // NOVA FUN«√O: Retorna qual È o GameObject principal que o indicador deve seguir
-    public GameObject GetAlvoPrincipal()
+    public void NormalizarAlvos()
     {
-        switch (tipo)
+        if (objetoA != null && objetoB != null && objetoA == objetoB)
+            objetoB = null;
+
+        if (tipo == TipoPasso.Clique)
         {
-            case TipoPasso.Clique:
-                return objetoClique;
-            case TipoPasso.Colisao:
-                return objetoA; // Em colisıes, vamos seguir o Objeto A por padr„o.
-            default:
-                return null;
+            objetoA = null;
+            objetoB = null;
+            objetoArrastavel = null;
+            destinoArrastar = null;
+        }
+        else if (tipo == TipoPasso.Arrastar)
+        {
+            objetoA = null;
+            objetoB = null;
+            objetoClique = null;
+        }
+
+    }
+    public IEnumerator ReproduzirFalas(AudioSource fonte, Text textoUI)
+    {
+        if (audiosPasso == null || textosPasso == null)
+            yield break;
+
+        int total = Mathf.Min(audiosPasso.Length, textosPasso.Length);
+        for (int i = 0; i < total; i++)
+        {
+            if (textoUI != null)
+                textoUI.text = textosPasso[i];
+
+            if (fonte != null && audiosPasso[i] != null)
+            {
+                fonte.clip = audiosPasso[i];
+                fonte.Play();
+                yield return new WaitForSeconds(fonte.clip.length + delayEntreFalas);
+            }
+            else
+                yield return new WaitForSeconds(delayEntreFalas);
         }
     }
 }
